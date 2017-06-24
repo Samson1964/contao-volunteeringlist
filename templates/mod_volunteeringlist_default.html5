@@ -1,0 +1,28 @@
+<div class="ce_volunteeringlist block">
+	<?php if ($this->headline): ?>
+		<<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
+	<?php endif; ?> 
+	<table class="volunteeringlist_default">
+		<tr>
+			<th>Zeitraum</th>
+			<th colspan="2">Amtsinhaber</th>
+		</tr>
+	<?php foreach($this->item as $item): ?>
+		<tr class="item <?php echo $item['class']; ?>">
+			<td><?php echo $item['fromto']; ?></td>
+			<td>
+				<?php if ($item['image']): ?>
+					<a href="<?php echo $item['image']; ?>" data-lightbox="vl<?php echo $item['id']; ?>">
+						<img src="<?php echo $item['thumbnail']; ?>">
+					</a>
+				<?php endif; ?>
+			</td>
+			<td>
+				<div class="name"><?php echo $item['name']; ?></div>
+				<div class="lebensdaten"><?php echo $item['lifedate']; ?></div>
+				<div class="info"><?php echo $item['info']; ?></div>
+			</td>
+		</tr>
+	<?php endforeach; ?>
+	</table>
+</div>
