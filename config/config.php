@@ -35,4 +35,11 @@ $GLOBALS['BE_MOD']['dsb']['volunteeringlist'] = array
  */
 $GLOBALS['TL_CTE']['schach']['volunteeringlist'] = 'VolunteeringlistClass';
 
-?>
+// Konfiguration für ProSearch
+$GLOBALS['PS_SEARCHABLE_MODULES']['volunteeringlist'] = array(
+	'icon'           => 'system/modules/volunteeringlist/assets/images/icon.png',
+	'title'          => array('title','name'),
+	'searchIn'       => array('title','name', 'info'),
+	'tables'         => array('tl_volunteeringlist', 'tl_volunteeringlist_items'),
+	'shortcut'       => 'vlist'
+);

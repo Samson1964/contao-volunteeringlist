@@ -100,7 +100,7 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array('protected'), 
-		'default'                     => '{person_legend},name,birthday,birthplace,deathday,deathplace,singleSRC;{function_legend},fromDate,toDate,info;{protected_legend:hide},protected;{expert_legend:hide},guest,cssID,space;{invisible_legend:hide},invisible,start,stop' 
+		'default'                     => '{person_legend},name,birthday,birthplace,deathday,deathplace,singleSRC;{function_legend},fromDate,toDate,info;{register_legend},spielerregister_id;{protected_legend:hide},protected;{expert_legend:hide},guest,cssID,space;{invisible_legend:hide},invisible,start,stop' 
 	),
 
 	// Subpalettes
@@ -160,11 +160,11 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 			),
 			'load_callback'           => array
 			(
-				array('tl_volunteeringlist_items', 'getDate')
+				array('\Samson\Helper', 'getDate')
 			),
 			'save_callback' => array
 			(
-				array('tl_volunteeringlist_items', 'putDate')
+				array('\Samson\Helper', 'putDate')
 			),
 			'sql'                     => "int(8) unsigned NOT NULL default '0'"
 		), 
@@ -197,11 +197,11 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 			),
 			'load_callback'           => array
 			(
-				array('tl_volunteeringlist_items', 'getDate')
+				array('\Samson\Helper', 'getDate')
 			),
 			'save_callback' => array
 			(
-				array('tl_volunteeringlist_items', 'putDate')
+				array('\Samson\Helper', 'putDate')
 			),
 			'sql'                     => "int(8) unsigned NOT NULL default '0'"
 		), 
@@ -234,11 +234,11 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 			),
 			'load_callback'           => array
 			(
-				array('tl_volunteeringlist_items', 'getDate')
+				array('\Samson\Helper', 'getDate')
 			),
 			'save_callback' => array
 			(
-				array('tl_volunteeringlist_items', 'putDate')
+				array('\Samson\Helper', 'putDate')
 			),
 			'sql'                     => "int(8) unsigned NOT NULL default '0'"
 		), 
@@ -256,11 +256,11 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 			),
 			'load_callback'           => array
 			(
-				array('tl_volunteeringlist_items', 'getDate')
+				array('\Samson\Helper', 'getDate')
 			),
 			'save_callback' => array
 			(
-				array('tl_volunteeringlist_items', 'putDate')
+				array('\Samson\Helper', 'putDate')
 			),
 			'sql'                     => "int(8) unsigned NOT NULL default '0'"
 		), 
@@ -272,6 +272,22 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 			'eval'                    => array('filesOnly'=>true, 'fieldType'=>'radio', 'tl_class'=>'clr'),
 			'sql'                     => "binary(16) NULL",
 		), 
+		'spielerregister_id' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['spielerregister_id'],
+			'exclude'                 => true,
+			'options_callback'        => array('tl_volunteeringlist_items', 'getRegisterliste'),
+			'inputType'               => 'select',
+			'eval'                    => array
+			(
+				'mandatory'           => false, 
+				'multiple'            => false, 
+				'chosen'              => true,
+				'submitOnChange'      => true,
+				'tl_class'            => 'long'
+			),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'" 
+		),
 		'info' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['info'],
@@ -389,64 +405,23 @@ class tl_volunteeringlist_items extends Backend
 	public function listPersons($arrRow)
 	{
 		$temp = '<div class="tl_content_left">';
-		($arrRow['fromDate']) ? $temp .= $this->getDate($arrRow['fromDate']) . ' - ' : $temp .= '? - ';
-		($arrRow['toDate']) ? $temp .= $this->getDate($arrRow['toDate']) : $temp .= '?';
+		($arrRow['fromDate']) ? $temp .= \Samson\Helper::getDate($arrRow['fromDate']) . ' - ' : $temp .= '? - ';
+		($arrRow['toDate']) ? $temp .= \Samson\Helper::getDate($arrRow['toDate']) : $temp .= '?';
 		if($arrRow['name']) $temp .= ' <b>' . $arrRow['name'] . '</b>';
 		return $temp.'</div>';
 	}
 
-	/**
-	 * Datumswert aus Datenbank umwandeln
-	 * @param mixed
-	 * @return mixed
-	 */
-	public function getDate($varValue)
+	public function getRegisterliste(DataContainer $dc)
 	{
-		$laenge = strlen($varValue);
-		$temp = '';
-		switch($laenge)
+		$array = array();
+		$objRegister = $this->Database->prepare("SELECT * FROM tl_spielerregister ORDER BY surname1,firstname1 ASC ")->execute();
+		$array[0] = '-';
+		while($objRegister->next())
 		{
-			case 8: // JJJJMMTT
-				$temp = substr($varValue,6,2).'.'.substr($varValue,4,2).'.'.substr($varValue,0,4);
-				break;
-			case 6: // JJJJMM
-				$temp = substr($varValue,4,2).'.'.substr($varValue,0,4);
-				break;
-			case 4: // JJJJ
-				$temp = $varValue;
-				break;
-			default: // anderer Wert
-				$temp = '';
+			$array[$objRegister->id] = $objRegister->surname1 . ',' . $objRegister->firstname1;
 		}
+		return $array;
 
-		return $temp;
 	}
 
-	/**
-	 * Datumswert für Datenbank umwandeln
-	 * @param mixed
-	 * @return mixed
-	 */
-	public function putDate($varValue)
-	{
-		$laenge = strlen(trim($varValue));
-		$temp = '';
-		switch($laenge)
-		{
-			case 10: // TT.MM.JJJJ
-				$temp = substr($varValue,6,4).substr($varValue,3,2).substr($varValue,0,2);
-				break;
-			case 7: // MM.JJJJ
-				$temp = substr($varValue,3,4).substr($varValue,0,2);
-				break;
-			case 4: // JJJJ
-				$temp = $varValue;
-				break;
-			default: // anderer Wert
-				$temp = 0;
-		}
-
-		return $temp;
-	}
- 	
 }

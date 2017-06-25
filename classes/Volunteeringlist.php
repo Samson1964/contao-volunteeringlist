@@ -34,7 +34,7 @@ class VolunteeringlistClass extends \ContentElement
 				$this->Template->title = $objListe->title;
 				// Listeneinträge laden
 				$objItems = $this->Database->prepare("SELECT * FROM tl_volunteeringlist_items WHERE pid=? ORDER BY sorting")
-			                               ->execute($this->volunteeringlist);
+				                           ->execute($this->volunteeringlist);
 				if($objItems)
 				{
 					$i = 0;
@@ -43,9 +43,23 @@ class VolunteeringlistClass extends \ContentElement
 						(bcmod($i,2)) ? $item[$i]['class'] = 'odd' : $item[$i]['class'] = 'even';
 						$item[$i]['id'] = $i;
 						$item[$i]['name'] = $objItems->name;
+						$item[$i]['register_id'] = $objItems->spielerregister_id;
+						// Lebensdaten formatieren
+						if($objItems->spielerregister_id)
+						{
+							// Eintrag im Spielerregister vorhanden
+							$objRegister = $this->Database->prepare('SELECT * FROM tl_spielerregister WHERE id = ?')
+							                    ->execute($objItems->spielerregister_id);
+							$item[$i]['birthday'] = $this->getDate($objRegister->birthday);
+							$item[$i]['deathday'] = $this->getDate($objRegister->deathday);
+						}
+						else
+						{
+							// Daten aus Funktionärsliste übernehmen
+							$item[$i]['birthday'] = $this->getDate($objItems->birthday);
+							$item[$i]['deathday'] = $this->getDate($objItems->deathday);
+						}
 						// Lebensdaten übernehmen
-						$item[$i]['birthday'] = $this->getDate($objItems->birthday);
-						$item[$i]['deathday'] = $this->getDate($objItems->deathday);
 						$item[$i]['lifedate'] = '';
 						if($item[$i]['birthday']) $item[$i]['lifedate'] .= '* ' . $item[$i]['birthday'] . ' ' . $item[$i]['birthplace'];
 						if($item[$i]['birthday'] && $item[$i]['deathday']) $item[$i]['lifedate'] .= ', &dagger; ' . $item[$i]['deathday'] . ' ' . $item[$i]['deathplace'];

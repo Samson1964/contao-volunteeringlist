@@ -16,6 +16,7 @@ $GLOBALS['TL_DCA']['tl_content']['subpalettes']['volunteeringlist_alttemplate'] 
 $GLOBALS['TL_DCA']['tl_content']['fields']['volunteeringlist'] = array
 (
 	'label'                => &$GLOBALS['TL_LANG']['tl_content']['volunteeringlist'],
+	'default'              => 'text',
 	'exclude'              => true,
 	'options_callback'     => array('tl_content_volunteeringlist', 'getVolunteeringlist'),
 	'inputType'            => 'select',
@@ -25,7 +26,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['volunteeringlist'] = array
 		'multiple'       => false, 
 		'chosen'         => true,
 		'submitOnChange' => true,
-		'tl_class'       => 'long wizard'
+		'tl_class'       => 'wizard'
 	),
 	'wizard'               => array
 	(

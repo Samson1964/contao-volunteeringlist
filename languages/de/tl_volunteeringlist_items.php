@@ -15,13 +15,13 @@ $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['person_legend'] = 'Personenang
 $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['name'][0] = 'Name';
 $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['name'][1] = 'Name der Person';
 $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['birthday'][0] = 'Geburtsdatum';
-$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['birthday'][1] = 'Format: TT.MM.JJJJ';
+$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['birthday'][1] = 'Format: TT.MM.JJJJ - Freilassen wenn Eintrag im Spielerregister zugeordnet ist';
 $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['birthplace'][0] = 'Geburtsort';
-$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['birthplace'][1] = 'Geburtsort';
+$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['birthplace'][1] = 'Geburtsort - Freilassen wenn Eintrag im Spielerregister zugeordnet ist';
 $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['deathday'][0] = 'Sterbedatum';
-$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['deathday'][1] = 'Format: TT.MM.JJJJ';
+$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['deathday'][1] = 'Format: TT.MM.JJJJ - Freilassen wenn Eintrag im Spielerregister zugeordnet ist';
 $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['deathplace'][0] = 'Sterbeort';
-$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['deathplace'][1] = 'Sterbeort';
+$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['deathplace'][1] = 'Sterbeort - Freilassen wenn Eintrag im Spielerregister zugeordnet ist';
 $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['singleSRC'][0] = 'Bild';
 $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['singleSRC'][1] = 'Bild hinzufügen';
 
@@ -32,6 +32,10 @@ $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['toDate'][0] = 'Bis';
 $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['toDate'][1] = 'Format: TT.MM.JJJJ';
 $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['info'][0] = 'Informationen';
 $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['info'][1] = 'Informationen zur Amtsperiode';
+
+$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['register_legend'] = 'Spielerregister';
+$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['spielerregister_id'][0] = 'Eintrag im Spielerregister';
+$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['spielerregister_id'][1] = 'Eintrag im Spielerregister';
 
 // Standardelemente
 $GLOBALS['TL_LANG']['tl_volunteeringlist_items']['protected_legend'] = 'Zugriffsschutz';
