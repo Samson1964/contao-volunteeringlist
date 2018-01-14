@@ -276,7 +276,7 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['spielerregister_id'],
 			'exclude'                 => true,
-			'options_callback'        => array('tl_volunteeringlist_items', 'getRegisterliste'),
+			'options_callback'        => array('Samson\Playerbase\Helper', 'getRegister'),
 			'inputType'               => 'select',
 			'eval'                    => array
 			(
@@ -409,19 +409,6 @@ class tl_volunteeringlist_items extends Backend
 		($arrRow['toDate']) ? $temp .= \Samson\Helper::getDate($arrRow['toDate']) : $temp .= '?';
 		if($arrRow['name']) $temp .= ' <b>' . $arrRow['name'] . '</b>';
 		return $temp.'</div>';
-	}
-
-	public function getRegisterliste(DataContainer $dc)
-	{
-		$array = array();
-		$objRegister = $this->Database->prepare("SELECT * FROM tl_spielerregister ORDER BY surname1,firstname1 ASC ")->execute();
-		$array[0] = '-';
-		while($objRegister->next())
-		{
-			$array[$objRegister->id] = $objRegister->surname1 . ',' . $objRegister->firstname1;
-		}
-		return $array;
-
 	}
 
 }
