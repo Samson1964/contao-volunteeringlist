@@ -33,7 +33,7 @@ $GLOBALS['BE_MOD']['dsb']['volunteeringlist'] = array
  * CONTENT ELEMENTS
  * -------------------------------------------------------------------------
  */
-$GLOBALS['TL_CTE']['schach']['volunteeringlist'] = 'VolunteeringlistClass';
+$GLOBALS['TL_CTE']['schach']['volunteeringlist'] = 'Samson\Volunteeringlist\Volunteeringlist';
 
 // Konfiguration für ProSearch
 $GLOBALS['PS_SEARCHABLE_MODULES']['volunteeringlist'] = array(

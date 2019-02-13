@@ -9,15 +9,15 @@
 		</tr>
 	<?php foreach($this->item as $item): ?>
 		<tr class="item <?php echo $item['class']; ?>">
-			<td><?php echo $item['fromto']; ?></td>
-			<td>
+			<td valign="top"><?php echo $item['fromto']; ?></td>
+			<td valign="top" width="70">
 				<?php if ($item['image']): ?>
 					<a href="<?php echo $item['image']; ?>" data-lightbox="vl<?php echo $item['id']; ?>">
-						<img src="<?php echo $item['thumbnail']; ?>">
+						<img src="<?php echo $item['thumbnail']; ?>" width="70" height="70">
 					</a>
 				<?php endif; ?>
 			</td>
-			<td>
+			<td valign="top">
 			<?php if($item['register_id']): ?>
 				<div class="name"><a href="person/player/<?php echo $item['register_id']; ?>.html" class="spielerregister"><?php echo $item['name']; ?></a></div>
 			<?php else: ?>

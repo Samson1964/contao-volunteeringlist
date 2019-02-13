@@ -5,7 +5,7 @@
  */
 namespace Samson\Volunteeringlist;
 
-class VolunteeringlistClass extends \ContentElement
+class Volunteeringlist extends \ContentElement
 {
 
 	/**
@@ -30,9 +30,9 @@ class VolunteeringlistClass extends \ContentElement
 			{
 				// Template zuweisen
 				if($this->volunteeringlist_alttemplate) // Alternativ-Template wurde definiert
-					$this->Template = new FrontendTemplate($this->volunteeringlist_template);
+					$this->Template = new \FrontendTemplate($this->volunteeringlist_template);
 				else // Kein Alternativ-Template, dann Standard-Template nehmen
-					($objListe->templatefile) ? $this->Template = new FrontendTemplate($objListe->templatefile) : $this->Template = new FrontendTemplate($this->strTemplate);
+					($objListe->templatefile) ? $this->Template = new \FrontendTemplate($objListe->templatefile) : $this->Template = new FrontendTemplate($this->strTemplate);
 				// Restliche Variablen zuweisen
 				$this->Template->id = $this->volunteeringlist;
 				$this->Template->vorlage = $objListe->templatefile;
@@ -86,7 +86,7 @@ class VolunteeringlistClass extends \ContentElement
 						{
 							$objFile = \FilesModel::findByPk($objItems->singleSRC);
 							$item[$i]['image'] = $objFile->path;
-							$item[$i]['thumbnail'] = Image::get($objFile->path, 70, 70, 'crop');
+							$item[$i]['thumbnail'] = \Image::get($objFile->path, 70, 70, 'crop');
 						}
 						else $item[$i]['image'] = '';
 						$i++;
