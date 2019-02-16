@@ -86,6 +86,7 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 				'label'               => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['toggle'],
 				'icon'                => 'visible.gif',
 				'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
+				'button_callback'     => array('tl_volunteeringlist_items', 'toggleIcon')
 			),
 			'show' => array
 			(
@@ -100,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array('protected'), 
-		'default'                     => '{person_legend},name,birthday,birthplace,deathday,deathplace,singleSRC;{function_legend},fromDate,toDate,info;{register_legend},spielerregister_id;{protected_legend:hide},protected;{expert_legend:hide},guest,cssID,space;{invisible_legend:hide},invisible,start,stop' 
+		'default'                     => '{person_legend},name,birthday,birthplace,deathday,deathplace,singleSRC;{function_legend},fromDate,toDate,info;{register_legend},spielerregister_id;{publish_legend},published'
 	),
 
 	// Subpalettes
@@ -298,73 +299,19 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 			'explanation'             => 'insertTags',
 			'sql'                     => "mediumtext NULL"
 		), 
-		'protected' => array
+		'published' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['protected'],
+			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['published'],
 			'exclude'                 => true,
 			'filter'                  => true,
+			'flag'                    => 1,
+			'default'                 => true,
 			'inputType'               => 'checkbox',
-			'eval'                    => array('submitOnChange'=>true),
+			'eval'                    => array
+			(
+				'doNotCopy'           => true
+			),
 			'sql'                     => "char(1) NOT NULL default ''"
-		),
-		'groups' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['groups'],
-			'exclude'                 => true,
-			'inputType'               => 'checkbox',
-			'foreignKey'              => 'tl_member_group.name',
-			'eval'                    => array('mandatory'=>true, 'multiple'=>true),
-			'sql'                     => "blob NULL",
-			'relation'                => array('type'=>'hasMany', 'load'=>'lazy')
-		),
-		'guests' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['guests'],
-			'exclude'                 => true,
-			'filter'                  => true,
-			'inputType'               => 'checkbox',
-			'eval'                    => array('tl_class'=>'w50'),
-			'sql'                     => "char(1) NOT NULL default ''"
-		),
-		'cssID' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['cssID'],
-			'exclude'                 => true,
-			'inputType'               => 'text',
-			'eval'                    => array('multiple'=>true, 'size'=>2, 'tl_class'=>'w50 clr'),
-			'sql'                     => "varchar(255) NOT NULL default ''"
-		),
-		'space' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['space'],
-			'exclude'                 => true,
-			'inputType'               => 'text',
-			'eval'                    => array('multiple'=>true, 'size'=>2, 'rgxp'=>'digit', 'nospace'=>true, 'tl_class'=>'w50'),
-			'sql'                     => "varchar(64) NOT NULL default ''"
-		),
-		'invisible' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['invisible'],
-			'exclude'                 => true,
-			'filter'                  => true,
-			'inputType'               => 'checkbox',
-			'sql'                     => "char(1) NOT NULL default ''"
-		),
-		'start' => array
-		(
-			'exclude'                 => true,
-			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['start'],
-			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-			'sql'                     => "varchar(10) NOT NULL default ''"
-		),
-		'stop' => array
-		(
-			'exclude'                 => true,
-			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['stop'],
-			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-			'sql'                     => "varchar(10) NOT NULL default ''"
 		),
 	)
 );
@@ -390,6 +337,68 @@ class tl_volunteeringlist_items extends Backend
 	{
 		parent::__construct();
 		$this->import('BackendUser', 'User');
+	}
+
+	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
+	{
+		$this->import('BackendUser', 'User');
+
+		if (strlen($this->Input->get('tid')))
+		{
+			$this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state') == 0));
+			$this->redirect($this->getReferer());
+		}
+
+		// Check permissions AFTER checking the tid, so hacking attempts are logged
+		if (!$this->User->isAdmin && !$this->User->hasAccess('tl_volunteeringlist_items::published', 'alexf'))
+		{
+			return '';
+		}
+
+		$href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.$row[''];
+
+		if (!$row['published'])
+		{
+			$icon = 'invisible.gif';
+		}
+
+		return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
+	}
+
+	public function toggleVisibility($intId, $blnPublished)
+	{
+		// Check permissions to publish
+		if (!$this->User->isAdmin && !$this->User->hasAccess('tl_volunteeringlist_items::published', 'alexf'))
+		{
+			$this->log('Kein Zugriffsrecht für Aktivierung Datensatz ID "'.$intId.'"', 'tl_volunteeringlist_items toggleVisibility', TL_ERROR);
+			// Zurücklink generieren, ab C4 ist das ein symbolischer Link zu "contao"
+			if (version_compare(VERSION, '4.0', '>='))
+			{
+				$backlink = \System::getContainer()->get('router')->generate('contao_backend');
+			}
+			else
+			{
+				$backlink = 'contao/main.php';
+			}
+			$this->redirect($backlink.'?act=error');
+		}
+		
+		$this->createInitialVersion('tl_volunteeringlist_items', $intId);
+		
+		// Trigger the save_callback
+		if (is_array($GLOBALS['TL_DCA']['tl_volunteeringlist']['fields']['published']['save_callback']))
+		{
+			foreach ($GLOBALS['TL_DCA']['tl_volunteeringlist']['fields']['published']['save_callback'] as $callback)
+			{
+				$this->import($callback[0]);
+				$blnPublished = $this->$callback[0]->$callback[1]($blnPublished, $this);
+			}
+		}
+		
+		// Update the database
+		$this->Database->prepare("UPDATE tl_volunteeringlist_items SET tstamp=". time() .", published='" . ($blnPublished ? '' : '1') . "' WHERE id=?")
+		               ->execute($intId);
+		$this->createNewVersion('tl_volunteeringlist_items', $intId);
 	}
 
 	/**

@@ -29,7 +29,7 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist'] = array
 			'keys' => array
 			(
 				'id'    => 'primary',
-				'alias' => 'index'
+				'title' => 'index'
 			)
 		)
 	),
@@ -40,7 +40,7 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist'] = array
 		'sorting' => array
 		(
 			'mode'                    => 1,
-			'fields'                  => array('alias'),
+			'fields'                  => array('title'),
 			'flag'                    => 1,
 			'panelLayout'             => 'filter;search,limit'
 		),
@@ -89,6 +89,13 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist'] = array
 				'attributes'          => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"',
 				'button_callback'     => array('tl_volunteeringlist', 'deleteArchive')
 			),
+			'toggle' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['tl_volunteeringlist']['toggle'],
+				'icon'                => 'visible.gif',
+				'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
+				'button_callback'     => array('tl_volunteeringlist', 'toggleIcon')
+			),
 			'show' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_volunteeringlist']['show'],
@@ -101,8 +108,7 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'__selector__'                => array('protected', 'allowComments'),
-		'default'                     => '{title_legend},title,alias;{template_legend},templatefile'
+		'default'                     => '{title_legend},title;{template_legend},templatefile;{publish_legend},published'
 	),
 
 	// Fields
@@ -125,19 +131,6 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist'] = array
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255),
 			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
-		'alias' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist']['alias'],
-			'exclude'                 => true,
-			'search'                  => true,
-			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'alias', 'unique'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
-			'save_callback' => array
-			(
-				array('tl_volunteeringlist', 'generateAlias')
-			),
-			'sql'                     => "varbinary(128) NOT NULL default ''"
-		), 
 		'templatefile' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist']['templatefile'],
@@ -147,6 +140,20 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist'] = array
 			'eval'                    => array('tl_class'=>'w50'),
 			'sql'                     => "varchar(64) NOT NULL default ''"
 		), 
+		'published' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist']['published'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'default'                 => true,
+			'inputType'               => 'checkbox',
+			'eval'                    => array
+			(
+				'doNotCopy'           => true
+			),
+			'sql'                     => "char(1) NOT NULL default ''"
+		),
 	)
 );
 
@@ -171,9 +178,73 @@ class tl_volunteeringlist extends Backend
 		$this->import('BackendUser', 'User');
 	}
 
+	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
+	{
+		$this->import('BackendUser', 'User');
+
+		if (strlen($this->Input->get('tid')))
+		{
+			$this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state') == 0));
+			$this->redirect($this->getReferer());
+		}
+
+		// Check permissions AFTER checking the tid, so hacking attempts are logged
+		if (!$this->User->isAdmin && !$this->User->hasAccess('tl_volunteeringlist::published', 'alexf'))
+		{
+			return '';
+		}
+
+		$href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.$row[''];
+
+		if (!$row['published'])
+		{
+			$icon = 'invisible.gif';
+		}
+
+		return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
+	}
+
+	public function toggleVisibility($intId, $blnPublished)
+	{
+		// Check permissions to publish
+		if (!$this->User->isAdmin && !$this->User->hasAccess('tl_volunteeringlist::published', 'alexf'))
+		{
+			$this->log('Kein Zugriffsrecht für Aktivierung Datensatz ID "'.$intId.'"', 'tl_volunteeringlist toggleVisibility', TL_ERROR);
+			// Zurücklink generieren, ab C4 ist das ein symbolischer Link zu "contao"
+			if (version_compare(VERSION, '4.0', '>='))
+			{
+				$backlink = \System::getContainer()->get('router')->generate('contao_backend');
+			}
+			else
+			{
+				$backlink = 'contao/main.php';
+			}
+			$this->redirect($backlink.'?act=error');
+		}
+		
+		$this->createInitialVersion('tl_volunteeringlist', $intId);
+		
+		// Trigger the save_callback
+		if (is_array($GLOBALS['TL_DCA']['tl_volunteeringlist']['fields']['published']['save_callback']))
+		{
+			foreach ($GLOBALS['TL_DCA']['tl_volunteeringlist']['fields']['published']['save_callback'] as $callback)
+			{
+				$this->import($callback[0]);
+				$blnPublished = $this->$callback[0]->$callback[1]($blnPublished, $this);
+			}
+		}
+		
+		// Update the database
+		$this->Database->prepare("UPDATE tl_volunteeringlist SET tstamp=". time() .", published='" . ($blnPublished ? '' : '1') . "' WHERE id=?")
+		               ->execute($intId);
+		$this->createNewVersion('tl_volunteeringlist', $intId);
+	}
+
 	public function getTemplates($dc)
 	{
-		return $this->getTemplateGroup('mod_volunteeringlist_', $dc->activeRecord->id);
+		$arr1 = $this->getTemplateGroup('mod_volunteeringlist_', $dc->activeRecord->id);
+		$arr2 = $this->getTemplateGroup('ce_volunteeringlist_', $dc->activeRecord->id);
+		return array_merge($arr1, $arr2);
 	} 
 
 	/**
@@ -222,41 +293,5 @@ class tl_volunteeringlist extends Backend
 	{
 		return ($this->User->isAdmin || $this->User->hasAccess('delete', 'newp')) ? '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.gif$/i', '_.gif', $icon)).' ';
 	}
-
-	/**
-	 * Generiert automatisch ein Alias aus dem Titel
-	 * @param mixed
-	 * @param \DataContainer
-	 * @return string
-	 * @throws \Exception
-	 */
-	public function generateAlias($varValue, DataContainer $dc)
-	{
-		$autoAlias = false;
-
-		// Generate alias if there is none
-		if ($varValue == '')
-		{
-			$autoAlias = true;
-			$varValue = standardize(\StringUtil::restoreBasicEntities($dc->activeRecord->title));
-		}
-
-		$objAlias = $this->Database->prepare("SELECT id FROM tl_volunteeringlist WHERE alias=?")
-								   ->execute($varValue);
-
-		// Check whether the news alias exists
-		if ($objAlias->numRows > 1 && !$autoAlias)
-		{
-			throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-		}
-
-		// Add ID to alias
-		if ($objAlias->numRows && $autoAlias)
-		{
-			$varValue .= '-' . $dc->id;
-		}
-
-		return $varValue;
-	} 
 
 }
