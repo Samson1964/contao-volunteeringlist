@@ -28,6 +28,13 @@ class Volunteeringlist extends \ContentElement
 			// Liste gefunden
 			if($objListe)
 			{
+				// Voreinstellungen Bilder laden
+				$picWidth = $this->volunteeringlist_picWidth ? $this->volunteeringlist_picWidth : $GLOBALS['TL_CONFIG']['volunteeringlist_picWidth'];
+				$picHeight = $this->volunteeringlist_picHeight ? $this->volunteeringlist_picHeight : $GLOBALS['TL_CONFIG']['volunteeringlist_picHeight'];
+
+				// Standard-CSS optional einbinden
+				if($GLOBALS['TL_CONFIG']['volunteeringlist_css']) $GLOBALS['TL_CSS']['volunteeringlist'] = 'system/modules/volunteeringlist/assets/default.css';
+
 				// Template zuweisen
 				if($this->volunteeringlist_alttemplate) // Alternativ-Template wurde definiert
 					$this->Template = new \FrontendTemplate($this->volunteeringlist_template);
@@ -42,53 +49,48 @@ class Volunteeringlist extends \ContentElement
 				                           ->execute($this->volunteeringlist, 1);
 				if($objItems)
 				{
-					$i = 0;
+
+					$item = array();
 					while($objItems->next())
 					{
-						(bcmod($i,2)) ? $item[$i]['class'] = 'odd' : $item[$i]['class'] = 'even';
-						$item[$i]['id'] = $i;
-						$item[$i]['name'] = $objItems->name;
-						$item[$i]['register_id'] = $objItems->spielerregister_id;
-						// Lebensdaten formatieren
+						// Spielerregister laden, wenn ID vorhanden
 						if($objItems->spielerregister_id)
 						{
-							// Eintrag im Spielerregister vorhanden
 							$objRegister = $this->Database->prepare('SELECT * FROM tl_spielerregister WHERE id = ?')
 							                    ->execute($objItems->spielerregister_id);
-							$item[$i]['birthday'] = $this->getDate($objRegister->birthday);
-							$item[$i]['deathday'] = $this->getDate($objRegister->deathday);
 						}
-						else
-						{
-							// Daten aus Funktionärsliste übernehmen
-							$item[$i]['birthday'] = $this->getDate($objItems->birthday);
-							$item[$i]['deathday'] = $this->getDate($objItems->deathday);
-						}
-						// Lebensdaten übernehmen
-						$item[$i]['lifedate'] = '';
-						if($item[$i]['birthday']) $item[$i]['lifedate'] .= '* ' . $item[$i]['birthday'] . ' ' . $item[$i]['birthplace'];
-						if($item[$i]['birthday'] && $item[$i]['deathday']) $item[$i]['lifedate'] .= ', &dagger; ' . $item[$i]['deathday'] . ' ' . $item[$i]['deathplace'];
-						elseif($item[$i]['deathday']) $item[$i]['lifedate'] .= '&dagger; ' . $item[$i]['deathday'] . ' ' . $item[$i]['deathplace'];
-						// Amtszeit übernehmen
-						$item[$i]['fromDate'] = $this->getDate($objItems->fromDate);
-						$item[$i]['toDate'] = $this->getDate($objItems->toDate);
-						if($item[$i]['fromDate'] == $item[$i]['toDate']) $item[$i]['fromto'] = $item[$i]['fromDate'];
-						else
-						{
-							if($item[$i]['fromDate'] && $item[$i]['toDate']) $item[$i]['fromto'] = $item[$i]['fromDate'] . ' - ' . $item[$i]['toDate'];
-							elseif($item[$i]['fromDate'] && !$item[$i]['toDate']) 
-								($i == 0) ? $item[$i]['fromto'] = 'seit ' . $item[$i]['fromDate'] : $item[$i]['fromto'] = 'von ' . $item[$i]['fromDate'];
-							elseif(!$item[$i]['fromDate'] && $item[$i]['toDate']) $item[$i]['fromto'] = 'bis ' . $item[$i]['toDate'];
-						}
-						$item[$i]['info'] = $objItems->info;
+
 						// Bild extrahieren
 						if($objItems->singleSRC)
 						{
 							$objFile = \FilesModel::findByPk($objItems->singleSRC);
-							$item[$i]['image'] = $objFile->path;
-							$item[$i]['thumbnail'] = \Image::get($objFile->path, 70, 70, 'crop');
+							$image = $objFile->path;
+							$thumbnail = \Image::get($objFile->path, $picWidth, $picHeight, 'crop');
 						}
-						else $item[$i]['image'] = '';
+						else 
+						{
+							$image = false;
+							$thumbnail = false;
+						}
+
+						// Person hinzufügen
+						$item[] = array
+						(
+							'class'             => bcmod($i,2) ? 'odd' : 'even',
+							'id'                => $i,
+							'name'              => $objItems->name,
+							'register_id'       => $objItems->spielerregister_id,
+							'birthday'          => $objRegister ? $this->getDate($objRegister->birthday) : $this->getDate($objItems->birthday),
+							'deathday'          => $objRegister ? $this->getDate($objRegister->deathday) : $this->getDate($objItems->deathday),
+							'playerbase_url'    => $objItems->spielerregister_id ? \Samson\Playerbase\Helper::getPlayerlink($objItems->spielerregister_id) : false,
+							'lifedate'          => self::getLivedata($objItems, $objRegister),
+							'fromDate'          => $this->getDate($objItems->fromDate),
+							'toDate'            => $this->getDate($objItems->toDate),
+							'fromto'            => self::getPeriod($objItems),
+							'info'              => $objItems->info,
+							'image'             => $image,
+							'thumbnail'         => $thumbnail
+						);
 						$i++;
 					}
 					$this->Template->items = $item;
@@ -125,5 +127,64 @@ class Volunteeringlist extends \ContentElement
 		return $temp;
 	}
 
+	/**
+	* Gibt die Lebensdaten formatiert zurück
+	* @param mixed
+	* @return mixed
+	*/
+	protected function getLivedata($objItem, $objRegister)
+	{
+		$birthday = $objRegister ? self::getDate($objRegister->birthday) : self::getDate($objItem->birthday);
+		$deathday = $objRegister ? self::getDate($objRegister->deathday) : self::getDate($objItem->deathday);
+		$birthplace = $objRegister ? $objRegister->birthplace : $objItem->birthplace;
+		$deathplace = $objRegister ? $objRegister->deathplace : $objItem->deathplace;
+
+		$return = '';
+		$return .= $birthday ? '* '.$birthday : '';
+		$return .= $birthplace ? ($return ? ' '.$birthplace : $birthplace) : '';
+		$return .= $deathday ? ($return ? ', &dagger; '.$deathday : '&dagger; '.$deathday) : '';
+		$return .= $deathplace ? ($return ? ' '.$deathplace : $deathplace) : '';
+
+		return $return;
+	}
+
+	/**
+	* Gibt die Amtszeit formatiert zurück
+	* @param mixed
+	* @return mixed
+	*/
+	protected function getPeriod($objItem)
+	{
+		// Artikel als Einleitung für Amtszeitbeginn festlegen
+		$von = $objItem->fromDate_unknown ? 'ca. ' : '';
+		// Artikel als Einleitung für Amtszeitende festlegen
+		$bis = $objItem->toDate_unknown ? 'ca. ' : '';
+		$between = '';
+
+		// Von/Bis-Artikel festlegen
+		if($objItem->fromDate && $objItem->toDate)
+		{
+			$von .= self::getDate($objItem->fromDate);
+			$bis .= self::getDate($objItem->toDate);
+			$between = ' - ';
+		}
+		elseif($objItem->fromDate && !$objItem->toDate)
+		{
+			$von = 'seit '.$von.self::getDate($objItem->fromDate);
+			$bis = '';
+		}
+		elseif(!$objItem->fromDate && $objItem->toDate)
+		{
+			$von = '';
+			$bis = 'bis '.$bis.self::getDate($objItem->toDate);
+		}
+		else
+		{
+			$von = '';
+			$bis = '';
+		}
+
+		return $von.$between.$bis;
+	}
+
 }
-?>
