@@ -33,6 +33,7 @@ ClassLoader::addClasses(array
  */
 TemplateLoader::addFiles(array
 (
-	'mod_volunteeringlist_default' => 'system/modules/volunteeringlist/templates',
-	'mod_volunteeringlist_mini'    => 'system/modules/volunteeringlist/templates',
+	'mod_volunteeringlist_default'             => 'system/modules/volunteeringlist/templates',
+	'mod_volunteeringlist_mini'                => 'system/modules/volunteeringlist/templates',
+	'ce_volunteeringlist_default'              => 'system/modules/volunteeringlist/templates',
 ));
