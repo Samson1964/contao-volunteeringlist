@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array('protected'), 
-		'default'                     => '{person_legend},name,birthday,birthplace,deathday,deathplace,singleSRC;{function_legend},fromDate,toDate,info;{register_legend},spielerregister_id;{publish_legend},published'
+		'default'                     => '{person_legend},name,birthday,birthplace,deathday,deathplace,singleSRC;{function_legend},fromDate,toDate,fromDate_unknown,toDate_unknown,info;{register_legend},spielerregister_id;{publish_legend},published'
 	),
 
 	// Subpalettes
@@ -243,6 +243,18 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 			),
 			'sql'                     => "int(8) unsigned NOT NULL default '0'"
 		), 
+		'fromDate_unknown' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['fromDate_unknown'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'inputType'               => 'checkbox',
+			'eval'                    => array
+			(
+				'tl_class'            => 'w50',
+			),
+			'sql'                     => "char(1) NOT NULL default ''"
+		),
 		'toDate' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['toDate'],
@@ -265,6 +277,18 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 			),
 			'sql'                     => "int(8) unsigned NOT NULL default '0'"
 		), 
+		'toDate_unknown' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['toDate_unknown'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'inputType'               => 'checkbox',
+			'eval'                    => array
+			(
+				'tl_class'            => 'w50',
+			),
+			'sql'                     => "char(1) NOT NULL default ''"
+		),
 		'singleSRC' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_volunteeringlist_items']['singleSRC'],
@@ -284,7 +308,6 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 				'mandatory'           => false, 
 				'multiple'            => false, 
 				'chosen'              => true,
-				'submitOnChange'      => true,
 				'tl_class'            => 'long'
 			),
 			'sql'                     => "int(10) unsigned NOT NULL default '0'" 

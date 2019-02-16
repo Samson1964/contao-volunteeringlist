@@ -12,7 +12,7 @@ class Volunteeringlist extends \ContentElement
 	 * Template
 	 * @var string
 	 */
-	protected $strTemplate = 'mod_volunteeringlist_default';
+	protected $strTemplate = 'ce_volunteeringlist_default';
 
 	/**
 	 * Generate the module
@@ -38,8 +38,8 @@ class Volunteeringlist extends \ContentElement
 				$this->Template->vorlage = $objListe->templatefile;
 				$this->Template->title = $objListe->title;
 				// Listeneinträge laden
-				$objItems = $this->Database->prepare("SELECT * FROM tl_volunteeringlist_items WHERE pid=? ORDER BY sorting")
-				                           ->execute($this->volunteeringlist);
+				$objItems = $this->Database->prepare("SELECT * FROM tl_volunteeringlist_items WHERE pid = ? AND published = ? ORDER BY sorting")
+				                           ->execute($this->volunteeringlist, 1);
 				if($objItems)
 				{
 					$i = 0;
@@ -91,7 +91,7 @@ class Volunteeringlist extends \ContentElement
 						else $item[$i]['image'] = '';
 						$i++;
 					}
-					$this->Template->item = $item;
+					$this->Template->items = $item;
 				}
 			}
 		}
