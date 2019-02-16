@@ -393,8 +393,8 @@ class tl_volunteeringlist_items extends Backend
 		// Check permissions to publish
 		if (!$this->User->isAdmin && !$this->User->hasAccess('tl_volunteeringlist_items::published', 'alexf'))
 		{
-			$this->log('Kein Zugriffsrecht für Aktivierung Datensatz ID "'.$intId.'"', 'tl_volunteeringlist_items toggleVisibility', TL_ERROR);
-			// Zurücklink generieren, ab C4 ist das ein symbolischer Link zu "contao"
+			$this->log('Kein Zugriffsrecht fÃ¼r Aktivierung Datensatz ID "'.$intId.'"', 'tl_volunteeringlist_items toggleVisibility', TL_ERROR);
+			// ZurÃ¼cklink generieren, ab C4 ist das ein symbolischer Link zu "contao"
 			if (version_compare(VERSION, '4.0', '>='))
 			{
 				$backlink = \System::getContainer()->get('router')->generate('contao_backend');

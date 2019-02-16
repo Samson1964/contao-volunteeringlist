@@ -19,7 +19,7 @@ class Volunteeringlist extends \ContentElement
 	 */
 	protected function compile()
 	{
-		// Adresse aus Datenbank laden, wenn ID übergeben wurde
+		// Adresse aus Datenbank laden, wenn ID Ã¼bergeben wurde
 		if($this->volunteeringlist)
 		{
 			// Listentitel laden
@@ -37,7 +37,7 @@ class Volunteeringlist extends \ContentElement
 				$this->Template->id = $this->volunteeringlist;
 				$this->Template->vorlage = $objListe->templatefile;
 				$this->Template->title = $objListe->title;
-				// Listeneinträge laden
+				// ListeneintrÃ¤ge laden
 				$objItems = $this->Database->prepare("SELECT * FROM tl_volunteeringlist_items WHERE pid = ? AND published = ? ORDER BY sorting")
 				                           ->execute($this->volunteeringlist, 1);
 				if($objItems)
@@ -60,16 +60,16 @@ class Volunteeringlist extends \ContentElement
 						}
 						else
 						{
-							// Daten aus Funktionärsliste übernehmen
+							// Daten aus FunktionÃ¤rsliste Ã¼bernehmen
 							$item[$i]['birthday'] = $this->getDate($objItems->birthday);
 							$item[$i]['deathday'] = $this->getDate($objItems->deathday);
 						}
-						// Lebensdaten übernehmen
+						// Lebensdaten Ã¼bernehmen
 						$item[$i]['lifedate'] = '';
 						if($item[$i]['birthday']) $item[$i]['lifedate'] .= '* ' . $item[$i]['birthday'] . ' ' . $item[$i]['birthplace'];
 						if($item[$i]['birthday'] && $item[$i]['deathday']) $item[$i]['lifedate'] .= ', &dagger; ' . $item[$i]['deathday'] . ' ' . $item[$i]['deathplace'];
 						elseif($item[$i]['deathday']) $item[$i]['lifedate'] .= '&dagger; ' . $item[$i]['deathday'] . ' ' . $item[$i]['deathplace'];
-						// Amtszeit übernehmen
+						// Amtszeit Ã¼bernehmen
 						$item[$i]['fromDate'] = $this->getDate($objItems->fromDate);
 						$item[$i]['toDate'] = $this->getDate($objItems->toDate);
 						if($item[$i]['fromDate'] == $item[$i]['toDate']) $item[$i]['fromto'] = $item[$i]['fromDate'];

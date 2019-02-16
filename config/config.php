@@ -23,3 +23,12 @@ $GLOBALS['BE_MOD']['content']['volunteeringlist'] = array
  * -------------------------------------------------------------------------
  */
 $GLOBALS['TL_CTE']['schach']['volunteeringlist'] = 'Samson\Volunteeringlist\Volunteeringlist';
+
+/**
+ * -------------------------------------------------------------------------
+ * Voreinstellungen
+ * -------------------------------------------------------------------------
+ */
+
+$GLOBALS['TL_CONFIG']['volunteeringlist_picWidth'] = 60;
+$GLOBALS['TL_CONFIG']['volunteeringlist_picHeight'] = 80;
