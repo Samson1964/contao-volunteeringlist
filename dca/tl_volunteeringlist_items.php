@@ -318,7 +318,12 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 			'exclude'                 => true,
 			'search'                  => true,
 			'inputType'               => 'textarea',
-			'eval'                    => array('rte'=>'tinyMCE', 'helpwizard'=>true),
+			'eval'                    => array
+			(
+				'rte'                 => 'tinyMCE',
+				'tl_class'            => 'clr long',
+				'helpwizard'          => true
+			),
 			'explanation'             => 'insertTags',
 			'sql'                     => "mediumtext NULL"
 		), 
