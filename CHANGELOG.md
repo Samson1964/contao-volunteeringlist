@@ -1,5 +1,8 @@
 # DSB-Funktionärsliste Changelog
 
+## Version 1.2.0 (2020-02-17)
+
+- Fix: Anpassung Core-Funktion getTemplateGroup
 - Fix: Auswahl Spielerregister wird nicht mehr unnötig refresht
 - Add: Anzeige ob Datensatz mit Spielerregister verknüpft ist
 
