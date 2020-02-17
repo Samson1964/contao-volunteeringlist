@@ -1,3 +1,3 @@
-# DSB-Funktionärsliste
+# Funktionärsliste
 
 **Frank Hoppe**

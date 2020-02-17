@@ -1,4 +1,13 @@
-# DSB-Funktionärsliste Changelog
+# Funktionärsliste Changelog
+
+## Version 1.2.0 (2019-02-16)
+
+- Add: Toggle-Funktion
+- Add: Neue Spalten für ungeklärte Daten
+- Add: Einstellungen für Bilder und CSS
+- Add: Neues Template
+- Deleted: Überflüssige Spalten
+- Deleted: Prosearch
 
 ## Version 1.2.0 (2020-02-17)
 
