@@ -308,10 +308,7 @@ $GLOBALS['TL_DCA']['tl_volunteeringlist_items'] = array
 				'mandatory'           => false, 
 				'multiple'            => false, 
 				'chosen'              => true,
-<<<<<<< HEAD
 				'submitOnChange'      => false,
-=======
->>>>>>> 84252f1fafaa479b049ffda8e6e9819f9ba6c831
 				'tl_class'            => 'long'
 			),
 			'sql'                     => "int(10) unsigned NOT NULL default '0'" 

@@ -64,10 +64,8 @@ class Volunteeringlist extends \ContentElement
 						if($objItems->singleSRC)
 						{
 							$objFile = \FilesModel::findByPk($objItems->singleSRC);
-<<<<<<< HEAD
 							$item[$i]['image'] = $objFile->path;
 							$item[$i]['thumbnail'] = \Image::get($objFile->path, 70, 70, 'crop');
-=======
 							$image = $objFile->path;
 							$thumbnail = \Image::get($objFile->path, $picWidth, $picHeight, 'crop');
 						}
@@ -75,7 +73,6 @@ class Volunteeringlist extends \ContentElement
 						{
 							$image = false;
 							$thumbnail = false;
->>>>>>> 84252f1fafaa479b049ffda8e6e9819f9ba6c831
 						}
 
 						// Person hinzufügen

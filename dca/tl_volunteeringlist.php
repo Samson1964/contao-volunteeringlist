@@ -242,7 +242,6 @@ class tl_volunteeringlist extends Backend
 
 	public function getTemplates($dc)
 	{
-<<<<<<< HEAD
 		if(version_compare(VERSION.BUILD, '2.9.0', '>=') && version_compare(VERSION.BUILD, '4.8.0', '<'))
 		{
 			// Den 2. Parameter gibt es nur ab Conato 2.9 bis 4.7
@@ -252,13 +251,7 @@ class tl_volunteeringlist extends Backend
 		{
 			return $this->getTemplateGroup('mod_volunteeringlist_');
 		}
-	}
-=======
-		$arr1 = $this->getTemplateGroup('mod_volunteeringlist_', $dc->activeRecord->id);
-		$arr2 = $this->getTemplateGroup('ce_volunteeringlist_', $dc->activeRecord->id);
-		return array_merge($arr1, $arr2);
 	} 
->>>>>>> 84252f1fafaa479b049ffda8e6e9819f9ba6c831
 
 	/**
 	 * Return the edit header button
@@ -307,7 +300,6 @@ class tl_volunteeringlist extends Backend
 		return ($this->User->isAdmin || $this->User->hasAccess('delete', 'newp')) ? '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.gif$/i', '_.gif', $icon)).' ';
 	}
 
-<<<<<<< HEAD
 	/**
 	 * Generiert automatisch ein Alias aus dem Titel
 	 * @param mixed
@@ -343,7 +335,4 @@ class tl_volunteeringlist extends Backend
 
 		return $varValue;
 	} 
-
-=======
->>>>>>> 84252f1fafaa479b049ffda8e6e9819f9ba6c831
 }
